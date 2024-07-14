@@ -17,6 +17,9 @@ Let's start by importing the Ames Housing dataset from ``ames.csv`` into a panda
 
 ```python
 # Import your data
+
+import pandas as pd
+ames = pd.read_csv('ames.csv')
 ```
 
 Now look at the first five rows of `ames`:  
@@ -24,6 +27,9 @@ Now look at the first five rows of `ames`:
 
 ```python
 # Inspect the first few rows
+# Inspect the first few rows
+
+ames.head()
 ```
 
 ## Variable Descriptions
@@ -74,11 +80,15 @@ Let's inspect all features using `.describe()` and `.info()`
 
 ```python
 # Use .describe()
+
+ames.describe()
 ```
 
 
 ```python
 # Use .info()
+
+ames.info()
 ```
 
 ### Plot Categorical Variables
@@ -89,6 +99,20 @@ Now, pick 6 categorical variables and plot them against SalePrice with a bar gra
 ```python
 import matplotlib.pyplot as plt
 %matplotlib inline
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(16,10), sharey=True)
+
+categoricals = ['BldgType', 'KitchenQual', 'SaleType', 'MSZoning', 'Street', 'Neighborhood']
+
+for col, ax in zip(categoricals, axes.flatten()):
+    (ames.groupby(col)               # group values together by column of interest
+         .mean()['SalePrice']        # take the mean of the saleprice for each group
+         .sort_values()              # sort the groups in ascending order
+         .plot
+         .bar(ax=ax))                # create a bar graph on the ax
+    
+    ax.set_title(col)                # Make the title the name of the column
+    
+fig.tight_layout()
 
 # Create bar plots
 ```
@@ -99,7 +123,16 @@ Create dummy variables for the six categorical features you chose remembering to
 
 
 ```python
+
 # Create dummy variables for your six categorical features
+
+dummies = pd.get_dummies(ames[categoricals], prefix=categoricals, drop_first=True)
+
+ames_preprocessed = ames.drop(categoricals, axis=1)
+
+ames_preprocessed = pd.concat([ames_preprocessed, dummies], axis=1)
+
+ames_preprocessed.head()
 
 ```
 
